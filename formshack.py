@@ -66,7 +66,7 @@ def config_read(config_file):
 			s1 = sline[1].strip()[1:-1]
 
 			if s0 == "url":
-				url = s1
+				url = s1 + "/responseForm"
 
 			else:
 				data[s0] = s1
