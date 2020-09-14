@@ -1,10 +1,7 @@
 import requests
 import random
+import os
 
-
-classes = ["10А", "10Б", "11А", "11Б", "9А", "9Б", "9В", "9Г", "8А", "8Б", "8В", "8Г", "8Д"]
-answers = ["тупо минус", "разъебано", "вынесено", "минус школка", "спам от 8Б", "накрутчик Мелков", "фаза краха", "fucksociety"]
-users = ["Бусова Ярослава, 10Б класс", "Мелков Никита, 9А класс", "Петров Дмитрий, 10А класс"]
 
 agents = [
 			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/82.0.4085.2 Safari/537.36",
@@ -26,12 +23,8 @@ agents = [
 		 ]
 
 
-
-url = "https://docs.google.com/forms/d/e/1FAIpQLScraBinzSEkC-8j0xm_7fOecVb0ICe9sy9CXyQHFwRsfuupIA/formResponse"
+url = ""
 data = {
-		 "entry.479749911": "",
-		 "entry.1462471023": "Бусова Ярослава, 10Б класс",
-		 "entry.1462471023_sentinel": "",
 		 "fvv": "1",
 		 "draftResponse": "",
 		 "pageHistory": "0",
@@ -45,28 +38,79 @@ headers = {
 	      }
 
 
+def divider(text, splitter):
+	result = ["", ""]
+	line = 0
 
-count = int(input("Count > "))
-i = 0
+	for char in text:
+		if char == splitter and line == 0:
+			line = 1
+			continue
 
-while count > i:
-	target = classes
+		result[line] += char
 
-	rnd1 = random.randint(100000000, 999999999)
-	rnd2 = random.randint(1000000000, 9999999999)
-	rnd3 = random.randint(0, len(target) - 1)
-	rnd4 = random.randint(0, len(agents) - 1)
+	return result
 
-	seed = str(rnd1) + str(rnd2)
-	draftResponse = f"[null,null,\"{seed}\"]\r\n"
 
-	data["fbzx"] = seed
-	data["draftResponse"] = draftResponse
-	data["entry.479749911"] = target[rnd3]
-	headers["User-Agent"] = agents[rnd4]
+def config_read(config_file):
+	with open(config_file) as config:
+		lines = config.readlines()
 
-	response = requests.post(url, headers=headers, data=data)
-	print("i = " + str(i) + "; status = " + str(response.status_code))
-	i += 1
+		for line in lines:
+			sline = divider(line, ":")
 
-print("Done!")
+			if len(sline) != 2:
+				continue;
+
+			s0 = sline[0].strip()
+			s1 = sline[1].strip()[1:-1]
+
+			if s0 == "url":
+				url = s1
+
+			else:
+				data[s0] = s1
+
+		print("Config read!")
+
+
+def main():
+	config_read("config.ini")
+
+	count = int(input("Count > "))
+	i = 0
+
+	while count > i:
+		rnd1 = random.randint(100000000, 999999999)
+		rnd2 = random.randint(1000000000, 9999999999)
+		rnd3 = random.randint(0, len(agents) - 1)
+
+		seed = str(rnd1) + str(rnd2)
+		draftResponse = f"[null,null,\"{seed}\"]\r\n"
+
+		data["fbzx"] = seed
+		data["draftResponse"] = draftResponse
+		headers["User-Agent"] = agents[rnd3]
+
+		response = requests.post(url, headers=headers, data=data)
+		i += 1
+
+		if response.status_code == 200:
+			print("Successfully,", i)
+
+		else:
+			print("Response error", response.status_code, ",", i)
+
+	print("Done!")
+
+
+if __name__ == "__main__":
+	try:
+		os.system("clear")
+		main()
+
+	except requests.exceptions.ConnectionError:
+		print("Connection error!")
+
+	except KeyboardInterrupt:
+		print("\nProgram was stopped by user!")
