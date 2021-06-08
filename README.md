@@ -1,4 +1,4 @@
-# formsHack
+# googleforms-abuse
 The program for flooding Google Forms, using the CSRF vulnerability.
 
 ## Using
