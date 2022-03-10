@@ -1,5 +1,5 @@
 # googleforms-abuse
-The program for flooding Google Forms, using the CSRF vulnerability.
+The program for flooding Google Forms.
 
 ## Using
 First - edit config.ini, adding parameters from POST request. You need to take this data from the browser (**DevTools -> Network -> Request for /responseForm**; for this you need to fill out a test questionnaire).
